@@ -1,0 +1,1 @@
+Application that makes a background request to an api that fetches prayer times and display them.
