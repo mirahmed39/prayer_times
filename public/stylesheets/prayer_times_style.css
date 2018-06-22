@@ -1,0 +1,12 @@
+body {
+    text-align: center;
+}
+
+#prayer_times_container {
+    margin-right: 10%;
+    margin-left: 10%;
+}
+
+#prayer_times_container .first-row {
+    background-color: burlywood;
+}
