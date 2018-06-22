@@ -3,8 +3,12 @@ body {
 }
 
 #prayer_times_container {
-    margin-right: 10%;
-    margin-left: 10%;
+    max-width: 890px;
+    margin: 0 auto;
+}
+
+#prayer_times_container > table {
+    transition-timing-function: ease-in;
 }
 
 #prayer_times_container .first-row {
