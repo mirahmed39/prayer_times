@@ -4,7 +4,7 @@ const prayer_times_button = document.querySelector("#prayer_times_button");
 prayer_times_button.addEventListener('click', function (event) {
     const date = new Date();
     console.log(date.getMonth(), date.getFullYear());
-    const city = 'New+York+City';
+    const city = 'Dhaka';
     const country = 'US';
     const month = String(date.getMonth() + 1);
     const year = String(date.getFullYear());
