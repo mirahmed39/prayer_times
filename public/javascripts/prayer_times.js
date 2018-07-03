@@ -1,58 +1,80 @@
-const prayer_times_button = document.querySelector("#prayer_times_button");
+// don't need the button for now.
+// const prayer_times_button = document.querySelector("#prayer_times_button");
 
 
-prayer_times_button.addEventListener('click', function (event) {
-    const date = new Date();
-    console.log(date.getMonth(), date.getFullYear());
-    const city = 'Dhaka';
-    const country = 'US';
-    const month = String(date.getMonth() + 1);
-    const year = String(date.getFullYear());
+function getPrayerTimes() {
+    const req1 = new XMLHttpRequest();
+    const apiKey = "1872a06d-7be8-4d9b-bbb5-0599c13073f6";
+    const requestUrl = "https://ipfind.co/me?auth="+apiKey;
 
+    req1.open('GET', requestUrl);
 
-    // making a background request through ajax
-    const req = new XMLHttpRequest();
-    let request_url = 'http://api.aladhan.com/v1/calendarByCity?'+'city='+city+'&country='+country+'&method=2&month='+month+'&year='+year;
-    console.log(request_url);
-    req.open('GET', request_url);
+    req1.addEventListener('load', (event) => {
+        if (req1.status >= 200 && req1.status < 300) {
+            const locationData = JSON.parse(req1.responseText);
+            console.log("Geolocation Data:",locationData);
+            const city = locationData['city'];
+            const country_code = locationData['country_code'];
+            console.log(city, country_code);
 
-    req.addEventListener('load', function(event) {
-        if (req.status >= 200 && req.status < 300) {
-            response = JSON.parse(req.responseText);
-            //console.log(response['data']);
-            prayer_times = response['data'];
-            //console.log('first item', prayer_times[0]);
             /*
-            get only one week of prayer times.
-            the current date can be used as an index for the
-            prayer times array. Using that index, we can
-            find a week of prayer times.
-            */
-            let times_for_week = [];
-            let current_date_index = date.getDate() - 1; // starts at index 0
-            //let current_date_index = 28;
-            let stop_date_index = -1;
-            if (current_date_index >= 24)
-                stop_date_index = prayer_times.length;
-            else
-                stop_date_index = current_date_index + 7;
+            now that we have the location data we need to make another
+            background request to an endpoint which will use the location
+            data to deliver appropriate prayer times.
+             */
+            const date = new Date();
+            console.log(date.getMonth(), date.getFullYear());
+            const month = String(date.getMonth() + 1);
+            const year = String(date.getFullYear());
 
-            while (current_date_index !== stop_date_index) {
-                //console.log('current date index',current_date_index);
-                //console.log(prayer_times[current_date_index]);
-                times_for_week.push(prayer_times[current_date_index]);
-                current_date_index++;
-            }
-            console.log('Times for a week',times_for_week);
-            populatePrayerTimes(times_for_week);
-        } else {
-            console.log('something went wrong getting the data');
+
+            // making a background request through ajax
+            const req2 = new XMLHttpRequest();
+            let request_url = 'http://api.aladhan.com/v1/calendarByCity?'+'city='+city+'&country='+country_code+'&method=2&month='+month+'&year='+year;
+            console.log(request_url);
+            req2.open('GET', request_url);
+
+            req2.addEventListener('load', function(event) {
+                if (req2.status >= 200 && req2.status < 300) {
+                    response = JSON.parse(req2.responseText);
+                    //console.log(response['data']);
+                    prayer_times = response['data'];
+                    //console.log('first item', prayer_times[0]);
+                    /*
+                    get only one week of prayer times.
+                    the current date can be used as an index for the
+                    prayer times array. Using that index, we can
+                    find a week of prayer times.
+                    */
+                    let times_for_week = [];
+                    let current_date_index = date.getDate() - 1; // starts at index 0
+                    //let current_date_index = 28;
+                    let stop_date_index = -1;
+                    if (current_date_index >= 24)
+                        stop_date_index = prayer_times.length;
+                    else
+                        stop_date_index = current_date_index + 7;
+
+                    while (current_date_index !== stop_date_index) {
+                        //console.log('current date index',current_date_index);
+                        //console.log(prayer_times[current_date_index]);
+                        times_for_week.push(prayer_times[current_date_index]);
+                        current_date_index++;
+                    }
+                    console.log('Times for a week',times_for_week);
+                    populatePrayerTimes(times_for_week);
+                } else {
+                    console.log('something went wrong getting the data');
+                }
+                // only need it for the button
+                //prayer_times_button.disabled = true;
+            });
+            req2.send();
         }
-        prayer_times_button.disabled = true;
     });
-    req.send();
 
-});
+    req1.send();
+}
 
 /*
 times is an array containing 7 objects. Each object represents
@@ -143,5 +165,8 @@ function insertRows(rowData, table) {
     table.appendChild(table_body);
 }
 
+
+// main function calling
+getPrayerTimes();
 
 
